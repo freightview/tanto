@@ -4,10 +4,10 @@
 #
 # MIT Licensed
 
-# Tanto is a minimalistic web scraping utility. It supports retrieving html from basic
-# requests and running arbitrary queries against it using the Cheerio library. It can
-# also take a hash of field names and selectors and return a hash with the data filled
-# out from the target page.
+# Tanto is a minimalistic web scraping utility. It supports retrieving html from
+# basic requests and running arbitrary queries against it using the Cheerio
+# library. It can also take a hash of field names and selectors and return a
+# hash with the data filled out from the target page.
 
 # External dependencies.
 
@@ -46,7 +46,7 @@ class Tanto
   # Handle the data returned by request. Set up the return object by loading
   # cheerio and processing the passed in schema, if it exists.
 
-  process: (err, req, body) =>
+  process: (err, res, body) =>
     if err then return @cb(err)
 
     @data =
@@ -54,6 +54,7 @@ class Tanto
       body: body
       values: @options.context || {}
       errors: {}
+      response: res
 
     @readValues() if @schema
 
@@ -64,8 +65,8 @@ class Tanto
   # in the error hash and move on.
 
   readValues: ->
-    for key, val of @schema 
-      try 
+    for key, val of @schema
+      try
         value = @data.$(val.selector)
       catch error
         @addSchemaError key, error
@@ -98,13 +99,13 @@ class Tanto
   transform: (data, opts) ->
     data = opts.transform(data, @data.values) if opts.transform?
     data
-    
+
   # Set the value, expanding the destination object as needed
-  
+
   setKey: (key, val) ->
     base = @data.values
     levels = key.split '.'
-  
+
     for level in levels
       last = base
       base = base[level] = base[level] or {}
